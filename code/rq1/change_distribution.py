@@ -1,4 +1,10 @@
 import re
+import numpy as np
+
+import matplotlib.pyplot as plt
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
 
 BASE_DATA = "../../data/"
 PROJECTS_LIST = BASE_DATA + "info/saved-settings-project-with-first-date.txt"
@@ -7,15 +13,12 @@ PROJECTS_LIST = BASE_DATA + "info/saved-settings-project-with-first-date.txt"
 
 PROJECTS = {}
 
-styles = ['-', '--', '-.', ':']
-colors = ['r', 'g', 'b', 'y']
 styles = ["-", "--", "-.", ":", "-", "--", "-.", ":"]
 marks = ["^", "d", "o", "v", "p", "s", "<", ">"]
-# marks_size=[15, 17, 10, 15, 17, 10, 12,15]
-marks_size = [15, 17, 10, 15, 17, 10, 12, 15]
+width = [3, 3, 3, 3, 3, 3, 3, 3]
+marks_size = [20, 20, 20, 20, 20, 10, 12, 15]
 marker_color = ['#0F52BA', '#ff7518', '#6CA939', '#e34234', '#756bb1', 'brown', '#c994c7', '#636363']
-
-gap = [5, 5, 3, 4, 5, 5]
+gaps = [4,4, 4, 4, 4, 4, 4, 4]
 
 
 def list_projects():
@@ -101,7 +104,6 @@ def decide_type(diffs, adds, edits):
 
 
 def analyse(project, methods, total_change):
-    given_percent_methods = [.01, .03, .05, .07, .10, .15, .20]
     index = 0
     stats = {}
     methods = sorted(methods.items(), key=lambda item: item[1], reverse=True)
@@ -125,7 +127,7 @@ def analyse(project, methods, total_change):
         current_percent_methods = float(count / total_methods)
         percent_change = float(moving_change / total_change)
         count += 1
-        if current_percent_methods >= given_percent_methods[index]:
+        if current_percent_methods * 100 >= given_percent_methods[index]:
             stats[given_percent_methods[index]] = percent_change
             index = index + 1
             if index == len(given_percent_methods):
@@ -135,18 +137,55 @@ def analyse(project, methods, total_change):
     # print(project, current_percent_methods, percent_change, min, max, name)
 
 
-if __name__ == "__main__":
+def ecdf(a):
+    x, counts = np.unique(a, return_counts=True)
+    cusum = np.cumsum(counts)
+    return x, cusum / cusum[-1]
 
+
+def draw_graph(STATS):
+    index = 0
+    for method_percent in given_percent_methods:
+        a = []
+        for project in STATS:
+            a.append(STATS[project][method_percent])
+        X, Y = ecdf(a)
+        ln = (plt.plot(X*100, Y))
+        plt.setp(ln, linewidth=width[index], ls=styles[index], marker=marks[index], markersize=marks_size[index],
+                 color=marker_color[index], markevery=gaps[index])
+        index += 1
+
+    plt.xlabel("Coverage", fontsize=24)
+    plt.ylabel("CDF", fontsize=22)
+    # plt.xscale("log")
+    for label in ax.get_xticklabels():
+        label.set_fontsize(23)
+    for label in ax.get_yticklabels():
+        label.set_fontsize(23)
+    plt.tight_layout()
+    plt.grid(True)
+    plt.legend(given_percent_methods, loc=0, fontsize=20)
+    # plt.xticks(np.arange(0.5, 0.88, 0.1))
+    # plt.xlim(0.0, 0.3)
+    plt.show()
+
+
+if __name__ == "__main__":
+    global given_percent_methods
+    STATS = {}
     # TODO we did not use age restriction yet
     global age_restriction
     global change_type
     change_types = ['revision', 'adds', 'diffs', 'edits']
-    change_type = change_types[3]
+    given_percent_methods = [5, 10, 15, 20]
+
+    change_type = change_types[0]
     apply_age_restriction = 0
     age_restriction = 730
     projects = list_projects()
 
     for project in projects:
         methods, total_change = process(project)
-        stats = analyse(project, methods, total_change)
-        print(project, stats)
+        STATS[project] = analyse(project, methods, total_change)
+
+    draw_graph(STATS)
