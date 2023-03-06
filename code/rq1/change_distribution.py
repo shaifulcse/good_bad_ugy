@@ -50,6 +50,8 @@ def process(project):
     total_change = 0
     for line in lines:
         method, value, total_change = process_method(line, feature_indexes, total_change)
+        if method == 'invalid':
+            continue
         if method not in methods:
             methods[method] = value
     return methods, total_change
@@ -58,25 +60,32 @@ def process(project):
 def process_method(line, feature_indexes, total_change):
     values = line.split("\t")
     method = values[feature_indexes['file']].strip()
+    age = int(values[0])
     diffs = values[feature_indexes['DiffSizes']]
     adds = values[feature_indexes['NewAdditions']]
     edits = values[feature_indexes['EditDistances']]
+    change_ages = values[feature_indexes['ChangeAtMethodAge']].split(",")
     values = decide_type(diffs, adds, edits)
-    value = calculate_value(values)
+    value = calculate_value(values, change_ages)
     total_change = total_change + value
+
+    if apply_age_restriction == 1 and age < age_restriction:
+        method = 'invalid'
     return method, value, total_change
 
 
-def calculate_value(values):
+def calculate_value(values, change_ages):
     values = values.split(",")
-
     value = 0
     for i in range(1, len(values)):
+        if int(change_ages[i]) > age_restriction and apply_age_restriction == 1:
+            break
         if change_type == 'revision':
             if int(values[i]) > 0:
                 value = value + 1
         else:
             value = value + int(values[i])
+
     return value
 
 
@@ -92,6 +101,9 @@ def decide_type(diffs, adds, edits):
 
 
 def analyse(project, methods, total_change):
+    given_percent_methods = [.01, .03, .05, .07, .10, .15, .20]
+    index = 0
+    stats = {}
     methods = sorted(methods.items(), key=lambda item: item[1], reverse=True)
     # for method in methods
     # print (methods)
@@ -100,14 +112,27 @@ def analyse(project, methods, total_change):
     count = 1.0
     total_methods = len(methods)
     moving_change = 0.0
+    min = 1000000000
+    max = -1
+    name = ''
     for method in methods:
+        if method[1] > max:
+            max = method[1]
+            name = method[0]
+        if method[1] < min:
+            min = method[1]
         moving_change += method[1]
-        percent_methods = float(count / total_methods)
+        current_percent_methods = float(count / total_methods)
         percent_change = float(moving_change / total_change)
         count += 1
-        if percent_change >= 0.8:
-            break
-    print(project, percent_methods, percent_change)
+        if current_percent_methods >= given_percent_methods[index]:
+            stats[given_percent_methods[index]] = percent_change
+            index = index + 1
+            if index == len(given_percent_methods):
+                break
+
+    return stats
+    # print(project, current_percent_methods, percent_change, min, max, name)
 
 
 if __name__ == "__main__":
@@ -115,11 +140,13 @@ if __name__ == "__main__":
     # TODO we did not use age restriction yet
     global age_restriction
     global change_type
-    change_type = 'revision'
-    apply_age_restriction = 1
+    change_types = ['revision', 'adds', 'diffs', 'edits']
+    change_type = change_types[3]
+    apply_age_restriction = 0
     age_restriction = 730
-
     projects = list_projects()
+
     for project in projects:
         methods, total_change = process(project)
-        analyse(project, methods, total_change)
+        stats = analyse(project, methods, total_change)
+        print(project, stats)
