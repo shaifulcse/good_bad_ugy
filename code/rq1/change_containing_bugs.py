@@ -50,7 +50,6 @@ def process(project):
     line = fr.readline()
     feature_indexes = build_indexes(line)
     lines = fr.readlines()
-    c = 0
     for line in lines:
         method, changes, bugs = process_method(line, feature_indexes)
         if method == 'invalid':
@@ -68,7 +67,7 @@ def process_method(line, feature_indexes):
     method = values[feature_indexes['file']].strip()
     age = int(values[0])
     if apply_age_restriction == 1 and age < age_restriction:
-        return 'invalid', 0
+        return 'invalid', -1, -1
 
     diffs = values[feature_indexes['DiffSizes']]
     adds = values[feature_indexes['NewAdditions']]
@@ -139,16 +138,18 @@ def decide_type(diffs, adds, edits):
 
 
 def calculate(STATS):
-    percents = {}
+    CDF_STATS = {}
     for project in STATS:
+        percents = {}
         total_bugs = 0
         methods = sorted(STATS[project].items(), key=lambda item: item[1]['changes'], reverse=True)
         for method in methods:
             total_bugs = total_bugs + method[1]['bugs']
-        print(methods)
-        print(project)
-        break
-        """
+
+        #print(methods)
+        #print(project)
+        #break
+
         count_methods = 1.0
         total_methods = len(methods)
         moving_bugs = 0.0
@@ -165,8 +166,41 @@ def calculate(STATS):
 
                 if index == len(given_percent_methods):
                     break
-        print (percents)
-        """
+        CDF_STATS[project] = percents
+
+    return CDF_STATS
+
+def ecdf(a):
+    x, counts = np.unique(a, return_counts=True)
+    cusum = np.cumsum(counts)
+    return x, cusum / cusum[-1]
+
+
+def draw_graph(CDF_STATS):
+    index = 0
+    for method_percent in given_percent_methods:
+        a = []
+        for project in STATS:
+            a.append(CDF_STATS[project][method_percent])
+        X, Y = ecdf(a)
+        ln = (plt.plot(X * 100, Y))
+        plt.setp(ln, linewidth=width[index], ls=styles[index], marker=marks[index], markersize=marks_size[index],
+                 color=marker_color[index], markevery=gaps[index])
+        index += 1
+
+    plt.xlabel("Coverage", fontsize=24)
+    plt.ylabel("CDF", fontsize=22)
+    # plt.xscale("log")
+    for label in ax.get_xticklabels():
+        label.set_fontsize(23)
+    for label in ax.get_yticklabels():
+        label.set_fontsize(23)
+    plt.tight_layout()
+    plt.grid(True)
+    plt.legend(given_percent_methods, loc=0, fontsize=20)
+    # plt.xticks(np.arange(0.5, 0.88, 0.1))
+    # plt.xlim(0.0, 0.3)
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -178,17 +212,17 @@ if __name__ == "__main__":
     global total_bugs
     global tangle_limit
     tangle_limit = 1
-    bug_type = 'not_conservative'  # 'conservative'
+    bug_type = 'not_conservative'  # 'conservative' or 'not_conservative'
     change_types = ['revision', 'adds', 'diffs', 'edits', 'bugs']
     given_percent_methods = [5, 10, 15, 20]
-    change_type = change_types[0]
+    change_type = change_types[3]
     apply_age_restriction = 0
     age_restriction = 730
-
     projects = list_projects()
 
     for project in projects:
         methods = process(project)
         STATS[project] = methods
 
-    calculate(STATS)
+    CDF_STATS = calculate(STATS)
+    draw_graph(CDF_STATS)

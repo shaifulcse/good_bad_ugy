@@ -1,0 +1,6 @@
+1. Does SLOC reveal the ugly methods?
+   i) rank correlation between sloc of all methods and their corresponding revisions (or other change indicators)?
+      --- which change indicator provide the best correlation?
+   ii) take the top 20% methods that covers the highest change.. then take the top 20% methods with SLOC. what is the overlap? what percentage can be captured by     SLOC? Does it increase if we take top 5 or 10% methods only?
+      
+      
