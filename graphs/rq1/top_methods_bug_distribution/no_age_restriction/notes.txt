@@ -1,0 +1,1 @@
+for example, diff_vs_bugs.pdf shows if we rank the methods based on their total diff, what percent of bugs can we cover by capturing top 5, 10, 15, or 20% methods.
