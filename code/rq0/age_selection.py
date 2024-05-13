@@ -1,20 +1,14 @@
-import re
 import os
 import matplotlib.pyplot as plt
-import re
-import numpy as np
 
 SRC_PATH = "../../data/cleaned/"
 selected_features = ['ChangeAtMethodAge', 'DiffSizes']
-age_vs_methods = {}  # how many methods we can catch with an age threshold
 age_vs_revisions = {}  # how many revisions we can catch with an age threshold
-indexes = {}
-total_revisions = 0
 max_year = 20
 
 
 def calculate_total_revisions():
-    global total_revisions
+    total_revisions = 0
     for file in os.listdir(SRC_PATH):
         fr = open(SRC_PATH + file)
         fr.readline()  # ignore the header
@@ -27,9 +21,11 @@ def calculate_total_revisions():
             for value in revisions:
                 if int(value) > 0:
                     total_revisions += 1
+    return total_revisions
 
 
 def calculate_year_based():
+    ages = []
     for file in os.listdir(SRC_PATH):
         fr = open(SRC_PATH + file)
         fr.readline()  # ignore the header
@@ -37,17 +33,31 @@ def calculate_year_based():
         for line in lines:
             data = line.strip().split("\t")
             age = int(data[0])
-            count_methods(age)
-            count_revisions(age, data)
+            ages.append(age)
+            #count_revisions(age, data)
+    age_vs_number_of_methods = count_methods(ages)
+    return age_vs_number_of_methods
 
 
-def count_methods(age):
-    years = int(age / 365)
-    for year in range(0, years + 1):
-        if year not in age_vs_methods:
-            age_vs_methods[year] = 1
-        else:
-            age_vs_methods[year] += 1
+def count_methods(ages):
+    """
+    given a list of ages (in days), we count how many methods can be captured
+    with a particular age threshold (in years)
+    """
+    age_vs_number_of_methods = {}
+    for age in ages:
+        years = calculate_years_from_days(age)
+        for year in range(0, years + 1):
+            if year not in age_vs_number_of_methods:
+                age_vs_number_of_methods[year] = 1
+            else:
+                age_vs_number_of_methods[year] += 1
+    return age_vs_number_of_methods
+
+
+def calculate_years_from_days(days):
+    years = int(days / 365)
+    return years
 
 
 def count_revisions(age, data):
@@ -69,20 +79,19 @@ def count_revisions(age, data):
 
 
 def find_indexes():
+    indexes = {}
     fr = open(SRC_PATH + "ant.txt")
     line = fr.readline()
     fr.close()
     data = line.strip().split("\t")
-    for f in selected_features:
-        for i in range(len(data)):
-            if f == data[i]:
-                indexes[f] = i
-                break
+    for i in range(len(data)):
+        indexes[data[i]] = i
+    return indexes
 
 
 if __name__ == "__main__":
-    find_indexes()
-    calculate_total_revisions()
+    indexes = find_indexes()
+    #total_revisions = calculate_total_revisions()
     calculate_year_based()
-    print("total_revisions", total_revisions)
-    print(age_vs_revisions)
+    #print("total_revisions", total_revisions)
+    #print(age_vs_revisions)
