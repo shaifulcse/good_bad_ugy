@@ -1,31 +1,15 @@
+import math
 import os
 import matplotlib.pyplot as plt
 
-SRC_PATH = "../../data/cleaned/"
 selected_features = ['ChangeAtMethodAge', 'DiffSizes']
-age_vs_revisions = {}  # how many revisions we can catch with an age threshold
-max_year = 20
+max_year = 30
 
 
-def calculate_total_revisions():
-    total_revisions = 0
-    for file in os.listdir(SRC_PATH):
-        fr = open(SRC_PATH + file)
-        fr.readline()  # ignore the header
-        lines = fr.readlines()
-        fr.close()
-        for line in lines:
-            data = line.strip().split("\t")
-            revisions = data[indexes['DiffSizes']]
-            revisions = revisions.split(",")
-            for value in revisions:
-                if int(value) > 0:
-                    total_revisions += 1
-    return total_revisions
-
-
-def calculate_year_based():
+def extract_from_file(indexes, SRC_PATH):
     ages = []
+    list_change_dates = []
+    list_revisions = []
     for file in os.listdir(SRC_PATH):
         fr = open(SRC_PATH + file)
         fr.readline()  # ignore the header
@@ -34,9 +18,37 @@ def calculate_year_based():
             data = line.strip().split("\t")
             age = int(data[0])
             ages.append(age)
-            #count_revisions(age, data)
-    age_vs_number_of_methods = count_methods(ages)
-    return age_vs_number_of_methods
+            revisions = data[indexes['DiffSizes']]
+            revisions = revisions.split(",")
+            list_revisions.append(revisions)
+            change_dates = data[indexes['ChangeAtMethodAge']]
+            change_dates = change_dates.split(",")
+            list_change_dates.append(change_dates)
+
+    return ages, list_revisions, list_change_dates
+
+
+def count_revisions(list_revisions, list_change_dates):
+    """
+      given a list of a list of revisions and list of a list of change dates (in days), we count how many revisions can be captured
+      with a particular age threshold (in years)
+    """
+    global max_year
+    age_vs_revisions = {}
+    for i in range(len(list_revisions)):
+        revisions = list_revisions[i]
+        change_dates = list_change_dates[i]
+        for j in range(len(revisions)):
+            if int(revisions[j]) > 0:
+
+                day = int(change_dates[j])
+                years = calculate_years_from_days_with_ceil(day)
+                for year in range(max_year, years - 1, -1):
+                    if year not in age_vs_revisions:
+                        age_vs_revisions[year] = 1
+                    else:
+                        age_vs_revisions[year] += 1
+    return age_vs_revisions
 
 
 def count_methods(ages):
@@ -60,27 +72,14 @@ def calculate_years_from_days(days):
     return years
 
 
-def count_revisions(age, data):
-    global max_year
-    revisions = data[indexes['DiffSizes']]
-    revisions = revisions.split(",")
-    change_dates = data[indexes['ChangeAtMethodAge']]
-    change_dates = change_dates.split(",")
-
-    for i in range(0, len(revisions)):
-        if int(revisions[i]) > 0:
-            day = int(change_dates[i])
-            years = int(day / 365)
-            for year in range(max_year, years - 1, -1):
-                if year not in age_vs_revisions:
-                    age_vs_revisions[year] = 1
-                else:
-                    age_vs_revisions[year] += 1
+def calculate_years_from_days_with_ceil(days):
+    years = math.ceil(float(days / 365))
+    return int(years)
 
 
-def find_indexes():
+def find_indexes(SRC_PATH):
     indexes = {}
-    fr = open(SRC_PATH + "ant.txt")
+    fr = open(SRC_PATH + "checkstyle.txt")
     line = fr.readline()
     fr.close()
     data = line.strip().split("\t")
@@ -90,8 +89,13 @@ def find_indexes():
 
 
 if __name__ == "__main__":
-    indexes = find_indexes()
-    #total_revisions = calculate_total_revisions()
-    calculate_year_based()
-    #print("total_revisions", total_revisions)
-    #print(age_vs_revisions)
+
+    SRC_PATH = "../../data/cleaned/"
+    indexes = find_indexes(SRC_PATH)
+    ages, list_revisions, list_change_dates = extract_from_file(indexes, SRC_PATH)
+    age_vs_revisions = count_revisions(list_revisions, list_change_dates)
+    age_vs_number_of_methods = count_methods(ages)
+
+    print (age_vs_number_of_methods[5])
+    print(age_vs_revisions[5])
+

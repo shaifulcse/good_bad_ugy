@@ -11,7 +11,7 @@ ax = fig.add_subplot(111)
 
 
 
-SRC_PATH="../../../mydata/data/cleaned/"
+SRC_PATH="../../data/cleaned/"
 
 
 dic = {}
