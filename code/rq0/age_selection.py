@@ -1,16 +1,7 @@
 import math
 import os
-import matplotlib.pyplot as plt
+import utility
 import numpy as np
-fig = plt.figure()
-ax = fig.add_subplot(111)
-
-styles = ["-", "--", "-.", ":", "-", "--", "-.", ":"]
-marks = ["^", "d", "o", "v", "p", "s", "<", ">"]
-width = [3, 3, 3, 3, 3, 3, 3, 3]
-marks_size = [20, 20, 20, 20, 20, 10, 12, 15]
-marker_color = ['#0F52BA', '#ff7518', '#6CA939', '#e34234', '#756bb1', 'brown', '#c994c7', '#636363']
-gaps = [4, 4, 4, 4, 4, 4, 4, 4]
 
 selected_features = ['ChangeAtMethodAge', 'DiffSizes']
 
@@ -99,27 +90,15 @@ def find_indexes(SRC_PATH):
 
 
 def draw_graph(methods, revisions):
-    ln = (plt.plot(range(1, len(methods)+1), methods))
-    plt.setp(ln, linewidth=width[0], ls=styles[0], color=marker_color[0])
-
-    ln = (plt.plot(range(1, len(revisions) + 1), revisions))
-    plt.setp(ln, linewidth=width[1], ls=styles[1], color=marker_color[1])
-
-    plt.xlabel("Year", fontsize=24)
-    plt.ylabel("Percent", fontsize=22)
-    plt.legend(['Methods', 'Revisions'], loc=0, fontsize=20)
-    #plt.xscale("log")
-    #plt.yscale("log")
-
-    for label in ax.get_xticklabels():
-        label.set_fontsize(20)
-    for label in ax.get_yticklabels():
-        label.set_fontsize(20)
-    plt.tight_layout()
-    plt.grid(True)
-    plt.xticks(np.arange(1, draw_upto + 1, 1))
-    # plt.xlim(0.0, 0.3)
-    plt.show()
+    lists = []
+    lists.append(methods)
+    lists.append(revisions)
+    configs = {}
+    configs["x_label"] = "Year"
+    configs["y_label"] = "Percent"
+    configs["legends"] = ["Methods", "Revisions"]
+    configs["x_ticks"] = np.arange(1, draw_upto + 1, 1)
+    utility.draw_line_graph(lists, configs)
 
 
 def prepare_for_drawing(age_vs_number_of_methods, age_vs_revisions):

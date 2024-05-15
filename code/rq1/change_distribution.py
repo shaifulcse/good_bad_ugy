@@ -173,14 +173,14 @@ def draw_graph(STATS):
 
 if __name__ == "__main__":
     global given_percent_methods
-    CDF_STATS = {}
     global age_restriction
     global change_type
-    change_types = ['revision', 'adds', 'diffs', 'edits', 'bugs']
+    CDF_STATS = {}
     given_percent_methods = [5, 10, 15, 20]
+    change_types = ['revision', 'adds', 'diffs', 'edits', 'bugs']
     change_type = change_types[4]
     apply_age_restriction = 1
-    age_restriction = 730
+    age_restriction = 2 * 365
     projects = list_projects()
 
     for project in projects:
