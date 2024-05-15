@@ -1,9 +1,18 @@
 import math
 import os
 import matplotlib.pyplot as plt
+import numpy as np
+fig = plt.figure()
+ax = fig.add_subplot(111)
+
+styles = ["-", "--", "-.", ":", "-", "--", "-.", ":"]
+marks = ["^", "d", "o", "v", "p", "s", "<", ">"]
+width = [3, 3, 3, 3, 3, 3, 3, 3]
+marks_size = [20, 20, 20, 20, 20, 10, 12, 15]
+marker_color = ['#0F52BA', '#ff7518', '#6CA939', '#e34234', '#756bb1', 'brown', '#c994c7', '#636363']
+gaps = [4, 4, 4, 4, 4, 4, 4, 4]
 
 selected_features = ['ChangeAtMethodAge', 'DiffSizes']
-max_year = 30
 
 
 def extract_from_file(indexes, SRC_PATH):
@@ -59,6 +68,7 @@ def count_methods(ages):
     age_vs_number_of_methods = {}
     for age in ages:
         years = calculate_years_from_days(age)
+
         for year in range(0, years + 1):
             if year not in age_vs_number_of_methods:
                 age_vs_number_of_methods[year] = 1
@@ -88,14 +98,57 @@ def find_indexes(SRC_PATH):
     return indexes
 
 
-if __name__ == "__main__":
+def draw_graph(methods, revisions):
+    ln = (plt.plot(range(1, len(methods)+1), methods))
+    plt.setp(ln, linewidth=width[0], ls=styles[0], color=marker_color[0])
 
+    ln = (plt.plot(range(1, len(revisions) + 1), revisions))
+    plt.setp(ln, linewidth=width[1], ls=styles[1], color=marker_color[1])
+
+    plt.xlabel("Year", fontsize=24)
+    plt.ylabel("Percent", fontsize=22)
+    plt.legend(['Methods', 'Revisions'], loc=0, fontsize=20)
+    #plt.xscale("log")
+    #plt.yscale("log")
+
+    for label in ax.get_xticklabels():
+        label.set_fontsize(20)
+    for label in ax.get_yticklabels():
+        label.set_fontsize(20)
+    plt.tight_layout()
+    plt.grid(True)
+    plt.xticks(np.arange(1, draw_upto + 1, 1))
+    # plt.xlim(0.0, 0.3)
+    plt.show()
+
+
+def prepare_for_drawing(age_vs_number_of_methods, age_vs_revisions):
+    global max_year
+    global draw_upto
+    draw_upto = 10
+    methods = []
+    revisions = []
+
+    for i in range(1, draw_upto + 1):
+        v = 100 * (age_vs_number_of_methods[i] / age_vs_number_of_methods[0])
+        methods.append(v)
+        v = 100 * (age_vs_revisions[i] / age_vs_revisions[max_year])
+        revisions.append(v)
+
+    return methods, revisions
+
+
+if __name__ == "__main__":
+    global max_year
+    max_year = 20
     SRC_PATH = "../../data/cleaned/"
     indexes = find_indexes(SRC_PATH)
     ages, list_revisions, list_change_dates = extract_from_file(indexes, SRC_PATH)
     age_vs_revisions = count_revisions(list_revisions, list_change_dates)
     age_vs_number_of_methods = count_methods(ages)
-
-    print (age_vs_number_of_methods[5])
-    print(age_vs_revisions[5])
-
+    methods, revisions = prepare_for_drawing(age_vs_number_of_methods, age_vs_revisions)
+    print(age_vs_number_of_methods[5], 100 * (age_vs_number_of_methods[5] / age_vs_number_of_methods[0]))
+    print(age_vs_revisions[5], 100 * (age_vs_revisions[5] / age_vs_revisions[max_year]))
+    #print(methods)
+    #print(revisions)
+    draw_graph(methods, revisions)

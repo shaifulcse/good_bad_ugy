@@ -1,1 +1,3 @@
 We need to check what should be the number of years for age restriction. 
+
+we are thinking between 4 and 5 years. 5 years gives us more than 83% changes. 

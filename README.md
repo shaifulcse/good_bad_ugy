@@ -1,5 +1,6 @@
 This study is important because there are many large and complex methods that were never changed. similarly, there were many small, and readable methods that changed many times. This means changes can happen for many other unknown factors. This makes prediction a very difficult job. But what we can do is learn from the majority of cases. What are good and what are ugly methods?
 
+ RQ 0) Which age should we select for age normalization? (part of methodology)
 
  RQ 1) Does it follow 80-20 rule (or what percent of methods (x%) are liable for 80% revisions) --- the ugly methods
  
