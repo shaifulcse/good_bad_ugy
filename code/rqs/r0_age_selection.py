@@ -1,32 +1,9 @@
-import math
-import os
-import utility
+
 import numpy as np
-
+from util import utility
+from util import graphs
 selected_features = ['ChangeAtMethodAge', 'DiffSizes']
-
-
-def extract_from_file(indexes, SRC_PATH):
-    ages = []
-    list_change_dates = []
-    list_revisions = []
-    for file in os.listdir(SRC_PATH):
-        fr = open(SRC_PATH + file)
-        fr.readline()  # ignore the header
-        lines = fr.readlines()
-        for line in lines:
-            data = line.strip().split("\t")
-            age = int(data[0])
-            ages.append(age)
-            revisions = data[indexes['DiffSizes']]
-            revisions = revisions.split(",")
-            list_revisions.append(revisions)
-            change_dates = data[indexes['ChangeAtMethodAge']]
-            change_dates = change_dates.split(",")
-            list_change_dates.append(change_dates)
-
-    return ages, list_revisions, list_change_dates
-
+max_year = 20
 
 def count_revisions(list_revisions, list_change_dates):
     """
@@ -42,7 +19,7 @@ def count_revisions(list_revisions, list_change_dates):
             if int(revisions[j]) > 0:
 
                 day = int(change_dates[j])
-                years = calculate_years_from_days_with_ceil(day)
+                years = utility.calculate_years_from_days_with_ceil(day)
                 for year in range(max_year, years - 1, -1):
                     if year not in age_vs_revisions:
                         age_vs_revisions[year] = 1
@@ -58,7 +35,7 @@ def count_methods(ages):
     """
     age_vs_number_of_methods = {}
     for age in ages:
-        years = calculate_years_from_days(age)
+        years = utility.calculate_years_from_days(age)
 
         for year in range(0, years + 1):
             if year not in age_vs_number_of_methods:
@@ -66,27 +43,6 @@ def count_methods(ages):
             else:
                 age_vs_number_of_methods[year] += 1
     return age_vs_number_of_methods
-
-
-def calculate_years_from_days(days):
-    years = int(days / 365)
-    return years
-
-
-def calculate_years_from_days_with_ceil(days):
-    years = math.ceil(float(days / 365))
-    return int(years)
-
-
-def find_indexes(SRC_PATH):
-    indexes = {}
-    fr = open(SRC_PATH + "checkstyle.txt")
-    line = fr.readline()
-    fr.close()
-    data = line.strip().split("\t")
-    for i in range(len(data)):
-        indexes[data[i]] = i
-    return indexes
 
 
 def draw_graph(methods, revisions):
@@ -98,7 +54,7 @@ def draw_graph(methods, revisions):
     configs["y_label"] = "Percent"
     configs["legends"] = ["Methods", "Revisions"]
     configs["x_ticks"] = np.arange(1, draw_upto + 1, 1)
-    utility.draw_line_graph(lists, configs)
+    graphs.draw_line_graph(lists, configs)
 
 
 def prepare_for_drawing(age_vs_number_of_methods, age_vs_revisions):
@@ -118,16 +74,14 @@ def prepare_for_drawing(age_vs_number_of_methods, age_vs_revisions):
 
 
 if __name__ == "__main__":
-    global max_year
-    max_year = 20
-    SRC_PATH = "../../data/cleaned/"
-    indexes = find_indexes(SRC_PATH)
-    ages, list_revisions, list_change_dates = extract_from_file(indexes, SRC_PATH)
-    age_vs_revisions = count_revisions(list_revisions, list_change_dates)
-    age_vs_number_of_methods = count_methods(ages)
+   
+    SRC_PATH = utility.BASE_PATH + "/data/cleaned/"
+
+    indexes = utility.find_indexes(SRC_PATH)
+    features_values = utility.extract_from_file(indexes, SRC_PATH, selected_features)
+    age_vs_revisions = count_revisions(features_values["DiffSizes"], features_values["ChangeAtMethodAge"])
+    age_vs_number_of_methods = count_methods(features_values["ages"])
     methods, revisions = prepare_for_drawing(age_vs_number_of_methods, age_vs_revisions)
     print(age_vs_number_of_methods[5], 100 * (age_vs_number_of_methods[5] / age_vs_number_of_methods[0]))
     print(age_vs_revisions[5], 100 * (age_vs_revisions[5] / age_vs_revisions[max_year]))
-    #print(methods)
-    #print(revisions)
     draw_graph(methods, revisions)
