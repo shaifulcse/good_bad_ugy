@@ -1,8 +1,11 @@
 import os
 import math
-
+import numpy as np
 BASE_PATH = "/home/shaiful/research/good_bad_ugy"
 
+apply_age_restriction = True
+age_restriction = 5 * 365
+total_change = 0
 def find_indexes(SRC_PATH):
     indexes = {}
     fr = open(SRC_PATH + "checkstyle.txt")
@@ -30,6 +33,13 @@ def extract_from_file(indexes, SRC_PATH, features):
                 collect_fields[feature].append(data[indexes[feature]].split(","))
     return collect_fields
 
+
+def ecdf(a):
+    x, counts = np.unique(a, return_counts=True)
+    cusum = np.cumsum(counts)
+    return x, cusum / cusum[-1]
+
+
 def extract_from_file_with_project (indexes, SRC_PATH, features):
 
     project_data = {}
@@ -52,7 +62,6 @@ def extract_from_file_with_project (indexes, SRC_PATH, features):
 def calculate_years_from_days_with_ceil(days):
     years = math.ceil(float(days / 365))
     return int(years)
-
 
 def calculate_years_from_days(days):
     years = int(days / 365)
