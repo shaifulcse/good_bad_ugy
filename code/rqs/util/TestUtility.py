@@ -7,6 +7,20 @@ def test_find_indexes(path):
     assert indexes['ChangeAtMethodAge'] == 40
     assert indexes['DiffSizes'] == 44
 
+
+def test_extract_from_file_with_project():
+    path = utility.BASE_PATH + "/data/cleaned/"
+    indexes = utility.find_indexes(path)
+    selected_features = ['ChangeAtMethodAge', 'DiffSizes','NewAdditions','EditDistances','RiskyCommit', 'file']
+    project_data = utility.extract_from_file_with_project(indexes, path, selected_features)
+
+    test_project_data = {}
+    test_project_data["argouml.txt"]={}
+    test_project_data["argouml.txt"]["10040.json"] = {}
+    test_project_data["argouml.txt"]["10040.json"]["ChangeAtMethodAge"] = ['0', '51', '339', '647', '816', '1536', '1949', '2019', '2271']
+    test_project_data["argouml.txt"]["10040.json"]["EditDistances"] = ['0', '11', '5', '16', '19', '1', '0', '0', '31']
+
+    assert project_data["argouml.txt"]["10040.json"]["ChangeAtMethodAge"] == test_project_data["argouml.txt"]["10040.json"]["ChangeAtMethodAge"]
 def test_extract_from_file(path):
     given_list_revisions = [[0, 0, 0, 13, 10, 7, 2, 10, 10], [0, 0, 0, 2, 2], [0], [0, 0, 0],
                             [0], [0, 0], [0, 0, 2, 0, 2], [0, 21], [0, 2, 1, 1], [0, 0, 2, 2]
@@ -86,3 +100,4 @@ if __name__ == '__main__':
     test_extract_from_file(path)
     calculate_years_from_days_with_ceil()
     test_years_from_days()
+    test_extract_from_file_with_project()

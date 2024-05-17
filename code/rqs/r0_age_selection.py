@@ -1,9 +1,10 @@
-
 import numpy as np
 from util import utility
 from util import graphs
+
 selected_features = ['ChangeAtMethodAge', 'DiffSizes']
 max_year = 20
+
 
 def count_revisions(list_revisions, list_change_dates):
     """
@@ -74,7 +75,6 @@ def prepare_for_drawing(age_vs_number_of_methods, age_vs_revisions):
 
 
 if __name__ == "__main__":
-   
     SRC_PATH = utility.BASE_PATH + "/data/cleaned/"
 
     indexes = utility.find_indexes(SRC_PATH)
