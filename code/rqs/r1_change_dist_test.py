@@ -119,8 +119,23 @@ def  test_process_method():
     value = r1_change_distribution.process_method(change_type, method)
     assert value == 1
 
+def test_analyze():
+  methods =  {'1421.json': 0, '3874.json': 10, '2413.json': 5, '1589.json': 6, '4217.json': 8,
+              '213.json': 200, '1000.json': 100, '10000.json': 30, '1500.json': 20,
+              '2500': 40, '2600': 60}
+  utility.total_change = 479
+  stats = r1_change_distribution.analyse(methods)
+
+  assert stats[5] == 0.4175365344467641
+  assert stats[10] == 0.6263048016701461
+  assert stats[15] == 0.6263048016701461
+  assert stats[20] == 0.7515657620041754
+
+
+
 if __name__ == '__main__':
     utility.age_restriction = 2 * 365 ## because this is what we test with
     test_get_change_values_with_type()
     test_calculate_value()
     test_process_method()
+    test_analyze()

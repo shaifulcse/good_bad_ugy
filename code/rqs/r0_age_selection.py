@@ -55,7 +55,7 @@ def draw_graph(methods, revisions):
     configs["y_label"] = "Percent"
     configs["legends"] = ["Methods", "Revisions"]
     configs["x_ticks"] = np.arange(1, draw_upto + 1, 1)
-    graphs.draw_line_graph(lists, configs)
+    graphs.draw_line_graph_multiple(lists, configs)
 
 
 def prepare_for_drawing(age_vs_number_of_methods, age_vs_revisions):

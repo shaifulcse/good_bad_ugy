@@ -1,4 +1,6 @@
 import utility
+
+
 def test_find_indexes(path):
     indexes = utility.find_indexes(path)
     assert indexes['SLOCStandard'] == 3
@@ -11,16 +13,20 @@ def test_find_indexes(path):
 def test_extract_from_file_with_project():
     path = utility.BASE_PATH + "/data/cleaned/"
     indexes = utility.find_indexes(path)
-    selected_features = ['ChangeAtMethodAge', 'DiffSizes','NewAdditions','EditDistances','RiskyCommit', 'file']
+    selected_features = ['ChangeAtMethodAge', 'DiffSizes', 'NewAdditions', 'EditDistances', 'RiskyCommit', 'file']
     project_data = utility.extract_from_file_with_project(indexes, path, selected_features)
 
     test_project_data = {}
-    test_project_data["argouml.txt"]={}
+    test_project_data["argouml.txt"] = {}
     test_project_data["argouml.txt"]["10040.json"] = {}
-    test_project_data["argouml.txt"]["10040.json"]["ChangeAtMethodAge"] = ['0', '51', '339', '647', '816', '1536', '1949', '2019', '2271']
+    test_project_data["argouml.txt"]["10040.json"]["ChangeAtMethodAge"] = ['0', '51', '339', '647', '816', '1536',
+                                                                           '1949', '2019', '2271']
     test_project_data["argouml.txt"]["10040.json"]["EditDistances"] = ['0', '11', '5', '16', '19', '1', '0', '0', '31']
 
-    assert project_data["argouml.txt"]["10040.json"]["ChangeAtMethodAge"] == test_project_data["argouml.txt"]["10040.json"]["ChangeAtMethodAge"]
+    assert project_data["argouml.txt"]["10040.json"]["ChangeAtMethodAge"] == \
+           test_project_data["argouml.txt"]["10040.json"]["ChangeAtMethodAge"]
+
+
 def test_extract_from_file(path):
     given_list_revisions = [[0, 0, 0, 13, 10, 7, 2, 10, 10], [0, 0, 0, 2, 2], [0], [0, 0, 0],
                             [0], [0, 0], [0, 0, 2, 0, 2], [0, 21], [0, 2, 1, 1], [0, 0, 2, 2]
@@ -34,8 +40,8 @@ def test_extract_from_file(path):
     features.add("DiffSizes")
     features_values = utility.extract_from_file(indexes, path, features)
     equal = 1
-    for i in range (len(features_values["ages"])):
-        if given_ages[i] != features_values["ages"] [i]:
+    for i in range(len(features_values["ages"])):
+        if given_ages[i] != features_values["ages"][i]:
             equal = 0
             break
     assert equal == 1
@@ -94,6 +100,13 @@ def test_years_from_days():
     assert utility.calculate_years_from_days(1096) == 3
 
 
+def test_ecdf():
+    a = [1, 1, 2.2, 2.2, 2, 3, 2, 4]
+    x, y = utility.ecdf(a)
+    y_expected = [0.25,  0.5,   0.75,  0.875, 1.]
+    assert y.tolist() == y_expected
+
+
 if __name__ == '__main__':
     path = utility.BASE_PATH + "/data/testing_data/"
     test_find_indexes(path)
@@ -101,3 +114,4 @@ if __name__ == '__main__':
     calculate_years_from_days_with_ceil()
     test_years_from_days()
     test_extract_from_file_with_project()
+    test_ecdf()
