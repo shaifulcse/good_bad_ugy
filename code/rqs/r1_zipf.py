@@ -76,21 +76,49 @@ def analyse(methods):
 
 
 def draw_graph(STATS):
-    index = 0
-    X = []
     Y = []
-    for method_percent in utility.given_percent_methods:
-        a = []
-        for project in STATS:
-            a.append(STATS[project][method_percent])
-        x, y = utility.ecdf(a)
-        X.append(x*100)
-        Y.append(y)
-    print(len(X), len(Y))
+    X = []
+    methods = sorted(STATS['hadoop.txt'].items(), key=lambda item: item[1], reverse=True)
+    a = []
+    for method in methods:
+        a.append(int(method[1]))
+    Y.append(a)
+    X.append(range(1, len(a)+1))
+
+    methods = sorted(STATS['checkstyle.txt'].items(), key=lambda item: item[1], reverse=True)
+    a = []
+    for method in methods:
+        a.append(int(method[1]))
+    Y.append(a)
+    X.append(range(1, len(a)+1))
+
+    methods = sorted(STATS['jna.txt'].items(), key=lambda item: item[1], reverse=True)
+    a = []
+    for method in methods:
+        a.append(int(method[1]))
+    Y.append(a)
+    X.append(range(1, len(a) + 1))
+
+    methods = sorted(STATS['ant.txt'].items(), key=lambda item: item[1], reverse=True)
+    a = []
+    for method in methods:
+        a.append(int(method[1]))
+    Y.append(a)
+    X.append(range(1, len(a) + 1))
+
+    methods = sorted(STATS['intellij-community.txt'].items(), key=lambda item: item[1], reverse=True)
+    a = []
+    for method in methods:
+        a.append(int(method[1]))
+    Y.append(a)
+    X.append(range(1, len(a) + 1))
+    index = 0
     configs = {}
-    configs["x_label"] = "Coverage"
-    configs["y_label"] = "CDF"
-    configs["legends"] = utility.given_percent_methods
+    configs["x_label"] = "Rank"
+    configs["y_label"] = "EditDistances"
+    configs["legends"] = ['hadoop', 'checkstyle', 'jna', 'ant', 'intellij']
+    configs["xscale"] = True
+    configs["yscale"] = True
     #configs["x_ticks"] = np.arange(20, 110, 10)
     graphs.draw_line_graph_multiple_with_x(X, Y, configs)
 
@@ -112,6 +140,5 @@ if __name__ == "__main__":
         if len(methods) < utility.minimum_required_methods:
             print("discarded project due to less than 30 samples: ", project)
             continue
-        STATS[project] = analyse(methods)
-
+        STATS[project] = methods
     draw_graph(STATS)

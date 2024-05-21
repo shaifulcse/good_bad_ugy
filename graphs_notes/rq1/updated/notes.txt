@@ -1,0 +1,10 @@
+with 5 years age restriction. 
+
+The following four projects were discarded because they don't have more than 30 methods with age >=5 years. 
+RxJava.txt
+junit5.txt
+Essentials.txt
+titan.txt
+
+
+Change size indicates 80-20 rules much more than revisions

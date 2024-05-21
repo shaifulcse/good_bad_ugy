@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-styles = ["-", "--", "-.", ":", "-", "--", "-.", ":"]
+styles = ["-", "--", "-.", "-", ":", "--", "-.", ":"]
 marks = ["^", "d", "o", "v", "p", "s", "<", ">"]
 width = [3, 3, 3, 3, 3, 3, 3, 3]
 marks_size = [20, 20, 20, 20, 20, 10, 12, 15]
 marker_color = ['#0F52BA', '#ff7518', '#6CA939', '#e34234', '#756bb1', 'brown', '#c994c7', '#636363']
-gaps = [4, 4, 4, 4, 4, 4, 4, 4]
+gaps = [1000, 100, 100, 100, 1000, 1000, 4, 4]
 
 
 def draw_line_graph_multiple(lists, config):
@@ -51,9 +51,14 @@ def draw_line_graph_multiple_with_x(X, lists, config):
         y = lists[i]
         x = X[i]
         ln = (plt.plot(x, y))
-        plt.setp(ln, linewidth=width[index], ls=styles[index], marker=marks[index], markersize=marks_size[index],
+        if 'marker' in config:
+            if config['marker']:
+                plt.setp(ln, linewidth=width[index], ls=styles[index], marker=marks[index], markersize=marks_size[index],
                  color=marker_color[index], markevery=gaps[index])
+        else:
+            plt.setp(ln, ls=styles[index], linewidth=width[index], color=marker_color[index])
         index += 1
+
     if "x_label" in config:
         plt.xlabel(config["x_label"], fontsize=24)
     if "y_label" in config:
