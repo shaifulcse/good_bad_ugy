@@ -1,0 +1,1 @@
+the revisions.pdf shows if we take the top 5% (and 10, 15, 20) of methods based on number of revisions, what percent of bugs can they capture. Other graphs show for diffs, adds, edits.

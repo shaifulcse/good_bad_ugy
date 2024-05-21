@@ -1,6 +1,7 @@
 import os
 import math
 import numpy as np
+
 BASE_PATH = "/home/shaiful/research/good_bad_ugy"
 
 apply_age_restriction = True
@@ -8,6 +9,7 @@ age_restriction = 5 * 365
 total_change = 0
 minimum_required_methods = 30
 given_percent_methods = [5, 10, 15, 20]
+
 
 def find_indexes(SRC_PATH):
     indexes = {}
@@ -19,8 +21,8 @@ def find_indexes(SRC_PATH):
         indexes[data[i]] = i
     return indexes
 
-def extract_from_file(indexes, SRC_PATH, features):
 
+def extract_from_file(indexes, SRC_PATH, features):
     collect_fields = {}
     for feature in features:
         collect_fields[feature] = []
@@ -43,28 +45,29 @@ def ecdf(a):
     return x, cusum / cusum[-1]
 
 
-def extract_from_file_with_project (indexes, SRC_PATH, features):
-
+def extract_from_file_with_project(indexes, SRC_PATH, features):
     project_data = {}
-    for file in os.listdir(SRC_PATH):
-        project_data[file] = {}
+    for project in os.listdir(SRC_PATH):
+        project_data[project] = {}
 
-        fr = open(SRC_PATH + file)
+        fr = open(SRC_PATH + project)
         fr.readline()  # ignore the header
         lines = fr.readlines()
         for line in lines:
             data = line.strip().split("\t")
             method = data[indexes['file']]
-            project_data[file][method] = {}
-            project_data[file][method]['age'] = int(data[0])
+            project_data[project][method] = {}
+            project_data[project][method]['age'] = int(data[0])
 
             for feature in features:
-                project_data[file][method][feature] = data[indexes[feature]].split(",")
+                project_data[project][method][feature] = data[indexes[feature]].split(",")
     return project_data
+
 
 def calculate_years_from_days_with_ceil(days):
     years = math.ceil(float(days / 365))
     return int(years)
+
 
 def calculate_years_from_days(days):
     years = int(days / 365)
