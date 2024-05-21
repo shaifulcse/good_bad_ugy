@@ -8,3 +8,8 @@ titan.txt
 
 
 Change size indicates 80-20 rules much more than revisions
+
+
+correlation_ranking_based_on_type.pdf shows the correlation when methods are ranked based on #revisions and edits, and diffs and edits. 
+
+correlation_ranking_based_on_type_restrict.pdf shows when methods with 0 revisions were discarded

@@ -1,6 +1,11 @@
+"""
+size(intersaction) / size (union) when top 20% methods are selected
+based on two change types
+"""
 import math
 from util import utility
 from util import graphs
+import numpy as np
 
 def process(change_type, project):
     methods = {}
@@ -8,11 +13,9 @@ def process(change_type, project):
         if utility.apply_age_restriction and project[method]['age'] < utility.age_restriction:
             continue
         method_change = process_method(change_type, project[method])
-        bugs = process_method("bugs", project[method])
         if method not in methods:
-            methods[method] = {}
-            methods[method]['change'] = method_change
-            methods[method]['bugs'] = bugs
+            methods[method] = method_change
+            utility.total_change = utility.total_change + method_change
         else:
             print("This should not happen")
     return methods
@@ -54,53 +57,36 @@ def get_change_values_with_type(change_type, method_data):
     if change_type == 'bugs':
         return method_data['RiskyCommit']
 
-def bug_distribution(methods):
-    stats = {}
-    methods = sorted(methods.items(), key=lambda item: item[1]['change'], reverse=True)
-    total_bugs = 0
-    for method in methods:
-        total_bugs += method[1]['bugs']
-    total_methods = len(methods)
-    for percent in utility.given_percent_methods:
-        stats[percent] = 0
-        num_top_methods = math.ceil((percent / 100) * total_methods)
-        count = 0
-        moving_bugs = 0.0
-        for method in methods:
-            moving_bugs += float(method[1]['bugs'])
-            count += 1
-            if count <= num_top_methods:
-                stats[percent] = float(moving_bugs / total_bugs)
-            else:
-                break
 
-    return stats
+def overlap(methods1, methods2):
+    methods1 = sorted(methods1.items(), key=lambda item: item[1], reverse=True)
+    methods2 = sorted(methods2.items(), key=lambda item: item[1], reverse=True)
 
-def draw_graph(STATS):
-    index = 0
-    X = []
-    Y = []
-    for method_percent in utility.given_percent_methods:
-        a = []
-        for project in STATS:
-            a.append(STATS[project][method_percent])
-        x, y = utility.ecdf(a)
-        X.append(x * 100)
-        Y.append(y)
-    configs = {}
-    configs["x_label"] = "Coverage"
-    configs["y_label"] = "CDF"
-    configs["legends"] = utility.given_percent_methods
-    configs['marker'] = True
-    #configs["x_ticks"] = np.arange(20, 110, 10)
-    graphs.draw_line_graph_multiple_with_x(X, Y, configs)
+    a = set()
+    b = set()
+    total_methods  = len(methods1)
+    percent = int((20/100) * total_methods)
+    c = 0
+    for method in methods1:
+        a.add(method[0])
+        c += 1
+        if c > percent:
+            break
+    c = 0
+    for method in methods2:
+        b.add(method[0])
+        c += 1
+        if c > percent:
+            break
+    print (len(a.intersection(b)) / len(a.union(b)))
+    # print(project, current_percent_methods, percent_change, min, max, name)
 
 
 if __name__ == "__main__":
     STATS = {}
     change_types = ['revision', 'adds', 'diffs', 'edits', 'bugs']
-    change_type = change_types[3]
-
+    change_type1 = change_types[2]
+    change_type2 = change_types[3]
     SRC_PATH = utility.BASE_PATH + "/data/cleaned/"
     selected_features = ['ChangeAtMethodAge', 'DiffSizes', 'NewAdditions', 'EditDistances', 'RiskyCommit', 'file']
 
@@ -108,10 +94,12 @@ if __name__ == "__main__":
     project_data = utility.extract_from_file_with_project(indexes, SRC_PATH, selected_features)
 
     for project in project_data:
-        methods = process(change_type, project_data[project])
-        if len(methods) < utility.minimum_required_methods:
-            print("discarded project due to less than 30 samples: ", project)
+        utility.total_change = 0
+        methods1 = process(change_type1, project_data[project])
+        utility.total_change = 0
+        methods2 = process(change_type2, project_data[project])
+        if len(methods1) < utility.minimum_required_methods:
+            #print("discarded project due to less than 30 samples: ", project)
             continue
-        STATS[project] = bug_distribution(methods)
-    draw_graph(STATS)
-    #print(STATS)
+        overlap(methods1, methods2)
+
