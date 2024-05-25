@@ -1,7 +1,10 @@
+"""
+
+"""
 import math
 from util import utility
 from util import graphs
-from scipy.stats.stats import kendalltau
+import numpy as np
 
 
 def process(change_type, project):
@@ -56,60 +59,82 @@ def get_change_values_with_type(change_type, method_data):
     if change_type == 'bugs':
         return method_data['RiskyCommit']
 
+def overlap_percent(methods):
+    methods1 = sorted(methods.items(), key=lambda item: item[1]['sloc'], reverse=True)
+    methods2 = sorted(methods.items(), key=lambda item: item[1]['change'], reverse=True)
+    a = []
+    b = []
+    total_methods = len(methods1)
+    percent = int((top_methods / 100) * total_methods)
+    c = 0
+    for method in methods1:
+        a.append(method[0])
+        c += 1
+        if c > percent:
+            break
+    c = 0
+    for method in methods2:
+        b.append(method[0])
+        c += 1
+        if c > percent:
+            break
 
-def draw_graph(correlations):
+    return calculate_percent(a, b)
+
+
+def calculate_percent(a, b):
+    common = set(a).intersection(set(b))
+    percent = (len(common) / len(a)) * 100
+    return percent
+
+def draw_graph(list):
     index = 0
     X = []
     Y = []
-    for ls in correlations:
+    for ls in list:
         x, y = utility.ecdf(ls)
         X.append(x)
         Y.append(y)
     configs = {}
-    configs["x_label"] = "Correlation"
+    configs["x_label"] = "Common"
     configs["y_label"] = "CDF"
     configs["legends"] = utility.change_legends
     configs['marker'] = True
     #configs["x_ticks"] = np.arange(20, 110, 10)
     graphs.draw_line_graph_multiple_with_x(X, Y, configs)
 
-
-def calculate_correlation(a, b):
-    cr = kendalltau(a, b)
-    return cr[0]
-
-
 if __name__ == "__main__":
     global feature_interest
+    global top_methods
+    top_methods = 20
     STATS = {}
     change_types = ['revision', 'adds', 'diffs', 'edits']
-    change_type = change_types[3]
 
     SRC_PATH = utility.BASE_PATH + "/data/cleaned/"
     feature_interest = 'McCabe'
+
     selected_features = [feature_interest, 'ChangeAtMethodAge', 'DiffSizes', 'NewAdditions', 'EditDistances',
                          'RiskyCommit', 'file']
 
     indexes = utility.find_indexes(SRC_PATH)
     project_data = utility.extract_from_file_with_project(indexes, SRC_PATH, selected_features)
-    #print(project_data['checkstyle.txt'])
-    all_correlations = []
+    all_overlaps = []
     for change_type in change_types:
-        cr = []
+        overlaps = []
         for project in project_data:
-
+            #if project != 'checkstyle.txt':
+            #    continue
             methods = process(change_type, project_data[project])
             if len(methods) < utility.minimum_required_methods:
                 #print("discarded project due to less than 30 samples: ", project)
                 continue
+            #op = overlap_ratio(methods)
+            op = overlap_percent(methods)
+            #print(op)
+            overlaps.append(op)
 
-            sloc = []
-            change = []
-            for method in methods:
-                sloc.append(methods[method]['sloc'])
-                change.append(methods[method]['change'])
-            c = calculate_correlation(sloc, change)
-            cr.append(calculate_correlation(sloc, change))
-        all_correlations.append(cr)
+        #print(change_type)
 
-    draw_graph(all_correlations)
+        all_overlaps.append(overlaps)
+    draw_graph(all_overlaps)
+

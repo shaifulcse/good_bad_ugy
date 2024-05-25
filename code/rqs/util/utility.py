@@ -5,7 +5,7 @@ import numpy as np
 BASE_PATH = "/home/shaiful/research/good_bad_ugy"
 
 apply_age_restriction = True
-age_restriction = 2 * 365
+age_restriction = 5 * 365
 total_change = 0
 minimum_required_methods = 30
 given_percent_methods = [5, 10, 15, 20]
