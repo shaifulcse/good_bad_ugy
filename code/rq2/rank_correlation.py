@@ -56,6 +56,7 @@ def process(project):
     lines = fr.readlines()
     for line in lines:
         method, value, sloc = process_method(line, feature_indexes)
+      
         if method == 'invalid':
             continue
         slocs.append(sloc)
@@ -75,7 +76,7 @@ def process_method(line, feature_indexes):
     edits = values[feature_indexes['EditDistances']]
     bugs = values[feature_indexes['RiskyCommit']]
     change_ages = values[feature_indexes['ChangeAtMethodAge']].split(",")
-    slocs = values[feature_indexes['Mcclure']].split(",")
+    slocs = values[feature_indexes['McCabe']].split(",")
     values = decide_type(diffs, adds, edits, bugs)
     value = calculate_value(values, change_ages)
     sloc = calculate_sloc(slocs)
@@ -165,7 +166,8 @@ if __name__ == "__main__":
         STATS[change_type] = []
         for project in projects:
             slocs, values = process(project)
-            STATS [change_type].append(correlation(slocs, values))
+            cr = correlation(slocs, values)
+            STATS [change_type].append(cr)
 
         print (STATS[change_type])
 

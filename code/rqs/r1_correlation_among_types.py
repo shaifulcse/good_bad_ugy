@@ -74,6 +74,7 @@ def calculate_correlations(STATS):
         correlations.append(cr[0])
     return correlations
 
+
 def draw_graph(X, Y):
     configs = {}
     configs["x_label"] = "Correlation"
@@ -82,6 +83,7 @@ def draw_graph(X, Y):
     configs['marker'] = True
     #configs["x_ticks"] = np.arange(20, 110, 10)
     graphs.draw_line_graph_multiple_with_x(X, Y, configs)
+
 
 if __name__ == "__main__":
     STATS = {}

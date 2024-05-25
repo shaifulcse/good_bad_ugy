@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-styles = ["-", "--", "-.", "-", ":", "--", "-.", ":"]
+styles = ["-", "--", "-.", ":", "-", "--", "-.", ":"]
 marks = ["^", "d", "o", "v", "p", "s", "<", ">"]
 width = [3, 3, 3, 3, 3, 3, 3, 3]
-marks_size = [20, 20, 20, 20, 20, 10, 12, 15]
+marks_size = [20, 15, 12, 14, 20, 10, 12, 15]
 marker_color = ['#0F52BA', '#ff7518', '#6CA939', '#e34234', '#756bb1', 'brown', '#c994c7', '#636363']
-gaps = [5, 5, 5, 5, 5, 5, 4, 4]
+gaps =  [5, 4, 2, 3, 5, 4, 4, 4]
 
 
 def draw_line_graph_multiple(lists, config):
