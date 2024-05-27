@@ -1,7 +1,10 @@
 """
 We are categorizing methods into ugly, good, bad, and noise.. top x% are ugly.
 0 changes are good. In between are bad, but if change is not at least 10% lower than ugly, then
-it's a noise. 
+it's a noise.
+
+The first two fields, project and file, are there for debugging. the second last feature, changevlaue is there for debugging
+We must remove these three fields while doing ML modeling
 """
 import os
 from util import utility
@@ -91,18 +94,31 @@ def check_threshold(methods):
     return method_type
 
 
-def write_to_file(project, SRC_PATH, DEST_PATH, method_type, indexes):
+def write_to_file(project, SRC_PATH, DEST_PATH, method_type, indexes, feature_to_write):
     fr = open(SRC_PATH + project)
     fw = open(DEST_PATH + project[:-4]+".csv", "w")
     header = fr.readline().strip()  # read the header
-    fw.write(header + "\tChangeValue\tType\n")
+
+    fw.write("Project\t")
+    for feature in feature_to_write:
+        fw.write(feature + "\t")
+    fw.write("ChangeValue\tType\n")
+
     lines = fr.readlines()
     fr.close()
     for line in lines:
         data = line.strip().split("\t")
         method = data[indexes['file']]
+
         if method in method_type:
-            fw.write(line.strip() + "\t" + str(method_type[method]['change']) + "\t" + method_type[method]['type'] + "\n")
+            fw.write(project[:-4] + "\t")
+            for feature in feature_to_write:
+                index = indexes[feature]
+                values = data[index].split(",")
+                fw.write(values[0] + "\t")
+            fw.write(str(method_type[method]['change']) + "\t" + method_type[method]['type'] + "\n")
+
+            #
     fw.close()
 
 
@@ -112,6 +128,46 @@ if __name__ == "__main__":
     global top_methods
     top_methods = 20
 
+    feature_to_write = [ "file",
+                         "SLOCAsItIs",
+                         "SLOCNoCommentPrettyPrinter",
+                         "SLOCStandard",
+                         "CommentCodeRation",
+                         "Readability",
+                         "SimpleReadability",
+                         "NVAR",
+                         "NCOMP",
+                         "Mcclure",
+                         "McCabe",
+                         "McCabeWOCases",
+                         "IndentSTD",
+                         "MaximumBlockDepth",
+                         "totalFanOut",
+                         "uniqueFanOut",
+                         "n1",
+                         "n2",
+                         "N1",
+                         "N2",
+                         "Vocabulary",
+                         "Length",
+                         "Volume",
+                         "Difficulty",
+                         "Effort",
+                         "Time",
+                         "HalsteadBugs",
+                         "MaintainabilityIndex",
+                         "isPrivate",
+                         "isProtected",
+                         "isDefault",
+                         "isPublic",
+                         "isStatic",
+                         "isAbstract",
+                         "isGetterSetter",
+                         "Parameters",
+                         "LocalVariables",
+                         "EnclosedExpressions",
+                         "MaxEnclosedNesting",
+                        ]
     method_type = {}
     change_types = ['revision', 'adds', 'diffs', 'edits']
     SRC_PATH = utility.BASE_PATH + "/data/cleaned/"
@@ -134,5 +190,5 @@ if __name__ == "__main__":
             continue
         method_type = check_threshold(methods)
         print(project)
-        write_to_file(project, SRC_PATH, DEST_PATH, method_type, indexes)
+        write_to_file(project, SRC_PATH, DEST_PATH, method_type, indexes, feature_to_write)
 
