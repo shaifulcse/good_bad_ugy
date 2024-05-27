@@ -4,8 +4,6 @@
 import math
 from util import utility
 from util import graphs
-import numpy as np
-
 
 def process(change_type, project):
     methods = {}
