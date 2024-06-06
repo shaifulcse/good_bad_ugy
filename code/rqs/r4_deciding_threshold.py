@@ -6,7 +6,6 @@ it's a noise.
 The first two fields, project and file, are there for debugging. the second last feature, changevlaue is there for debugging
 We must remove these three fields while doing ML modeling
 """
-import os
 from util import utility
 
 
@@ -171,7 +170,7 @@ if __name__ == "__main__":
     method_type = {}
     change_types = ['revision', 'adds', 'diffs', 'edits']
     SRC_PATH = utility.BASE_PATH + "/data/cleaned/"
-    DEST_PATH = utility.BASE_PATH + "/data/ML/"
+    DEST_PATH = utility.BASE_PATH + "/data/ML/all/"
     feature_interest = 'McCabe'
 
     selected_features = [feature_interest, 'ChangeAtMethodAge', 'DiffSizes', 'NewAdditions', 'EditDistances',

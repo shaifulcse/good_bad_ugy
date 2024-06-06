@@ -8,6 +8,11 @@ DEST_PATH = utility.BASE_PATH + "/data/ML/train-test/"
 
 def split():
     training_files, test_files = select_train_test()
+    print(training_files)
+    print(len(training_files))
+    print(test_files)
+    print(len(test_files))
+
     f_train = open(DEST_PATH + "train.csv", "w")
     f_test = open(DEST_PATH + "test.csv", "w")
 
@@ -16,7 +21,7 @@ def split():
     f_train.write(header.strip() + "\n")
     f_test.write(header.strip() + "\n")
     fr.close()
-  
+
     for file in os.listdir(SRC_PATH):
         if file in training_files:
             fw = f_train
@@ -29,25 +34,20 @@ def split():
             fw.write(line.strip() + "\n")
         fr.close()
     fw.close()
-
 def select_train_test():
-    train = set()
-    test = set()
+    train = []
+    test = []
     files = []
     for file in os.listdir(SRC_PATH):
         files.append(file)
+    random.seed(0)
 
-    random.seed(len(files))
-    count = 0
-    while count < int((70 / 100) * len(files)):
-        index = random.randint(0, len(files) - 1)
-        if files[index] not in train:
-            train.add(files[index])
-            count += 1
+    #train = random.sample(files, int((90 / 100) * len(files)))
+    train = ['hibernate-search.csv', 'facebook-android-sdk.csv', 'checkstyle.csv', 'lucene-solr.csv', 'junit4.csv', 'atmosphere.csv', 'jgit.csv', 'wicket.csv', 'netty.csv', 'elasticsearch.csv', 'cassandra.csv', 'lombok.csv', 'docx4j.csv', 'mongo-java-driver.csv', 'commons-lang.csv', 'voldemort.csv', 'ant.csv', 'sonarqube.csv', 'flink.csv', 'intellij-community.csv', 'weka.csv', 'xerces2-j.csv', 'hadoop.csv', 'hibernate-orm.csv', 'spring-boot.csv', 'wildfly.csv', 'presto.csv', 'hbase.csv', 'argouml.csv', 'eclipseJdt.csv', 'jna.csv', 'spring-framework.csv', 'commons-io.csv', 'jclouds.csv', 'cucumber-jvm.csv', 'guava.csv']
 
     for file in files:
         if file not in train:
-            test.add(file)
+            test.append(file)
 
     return train, test
 

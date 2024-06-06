@@ -1,0 +1,21 @@
+so far the best result happened with 
+
+training projects:
+{'hibernate-search.csv', 'facebook-android-sdk.csv', 'checkstyle.csv', 'lucene-solr.csv', 'junit4.csv', 'atmosphere.csv', 'jgit.csv', 'wicket.csv', 'netty.csv', 'elasticsearch.csv', 'cassandra.csv', 'lombok.csv', 'docx4j.csv', 'mongo-java-driver.csv', 'commons-lang.csv', 'voldemort.csv', 'ant.csv', 'sonarqube.csv', 'flink.csv', 'intellij-community.csv', 'weka.csv', 'xerces2-j.csv', 'hadoop.csv', 'hibernate-orm.csv', 'spring-boot.csv', 'wildfly.csv', 'presto.csv', 'hbase.csv', 'argouml.csv', 'eclipseJdt.csv', 'jna.csv', 'spring-framework.csv', 'commons-io.csv', 'jclouds.csv', 'cucumber-jvm.csv', 'guava.csv'}
+
+test projects:
+
+{'pmd.csv', 'javaparser.csv', 'vraptor4.csv', 'hector.csv', 'okhttp.csv', 'mockito.csv', 'jetty.csv', 'hazelcast.csv', 'openmrs-
+core.csv'}
+
+
+Testing Accuracy:  0.8356412792614573
+Testing Precision:  0.7475490196078431
+Testing Recall:  0.8070038910505837
+Testing F1-Score:  0.7761395105156799
+
+
+configuration:
+
+rf_cls = DecisionTreeClassifier(random_state=0, max_depth = 7)
+classes = ugly and good only
