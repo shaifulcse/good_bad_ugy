@@ -17,7 +17,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-
+from sklearn.neural_network import MLPClassifier
 
 selected_features = ["SLOCStandard",
                      "CommentCodeRation",
@@ -79,7 +79,7 @@ def report_results(type_data, algorithm, actual_y, pred_y):
 
 def train_model(algorithm, train_x, train_y):
     if algorithm == 'LogisticRegression':
-        rf_cls = LogisticRegression(random_state=0, max_iter = 10000)
+        rf_cls = LogisticRegression(random_state=0, max_iter = 10000, verbose = True)
     if algorithm == "RandomForest":
         rf_cls = RandomForestClassifier(n_estimators=10, max_depth=10, min_samples_split=5,
                                         min_samples_leaf=5, max_features = 8)
@@ -90,9 +90,13 @@ def train_model(algorithm, train_x, train_y):
         rf_cls = AdaBoostClassifier(n_estimators=100, algorithm="SAMME", random_state=0)
 
     if algorithm == "SVM":
-        rf_cls = SVC(C=1.0, kernel='rbf', degree=3, gamma='scale', coef0=0.0, shrinking=True, probability=False, tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=-1, decision_function_shape='ovr', break_ties=False, random_state=None)
-
+        rf_cls = make_pipeline(StandardScaler(), SVC(max_iter=5000))
+    if algorithm == "NN":
+        print("In NN")
+        rf_cls = MLPClassifier(max_iter= 1000, solver='adam', alpha=0, learning_rate_init = 0.0001,
+                            hidden_layer_sizes=(10), warm_start= False, verbose = True)
     rf_cls.fit(train_x, train_y)
+
     return rf_cls
 
 
@@ -111,12 +115,32 @@ if __name__ == "__main__":
     train_x, train_y = oversampling(train_x, train_y)
 
     test_x, test_y = clean_data(test_data)
-    algorithm = algorithms[4]
-    cls = train_model(algorithm, train_x, train_y)
 
+    algorithm = algorithms[0]
+    if algorithm == "NN":
+        print ("scaling")
+        scaler = StandardScaler()
+        # Don't cheat - fit only on training data
+        scaler.fit(train_x)
+        train_x = scaler.transform(train_x)
+        # apply same transformation to test data
+        test_x = scaler.transform(test_x)
+
+    cls = train_model(algorithm, train_x, train_y)
+    print (cls.coef_[0])
     pred_y = predict(train_x, cls)
     report_results("Training", algorithm, train_y, pred_y)
 
     pred_y = predict(test_x, cls)
     report_results("Testing", algorithm, test_y, pred_y)
+
+    # tot = 0
+    # acc = 0
+    # for i in range (pred_y.shape[0]):
+    #     print(test_y.values[i], pred_y[i])
+    #     if test_y.values[i] == pred_y[i]:
+    #         acc += 1
+    #     tot += 1
+    # print (acc/tot)
+
 

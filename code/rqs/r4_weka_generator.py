@@ -33,13 +33,24 @@ def process(selected_features, indexes, file):
 if __name__ == "__main__":
     selected_features = [
         "SLOCStandard",
-        "Readability",
-        "McCabe",
-        "MaximumBlockDepth",
-        "uniqueFanOut",
-        "MaintainabilityIndex",
-        "isGetterSetter",
-        "Parameters"
+         "CommentCodeRation",
+         "Readability",
+         "SimpleReadability",
+         "NVAR",
+         "NCOMP",
+         "McCabe",
+         "IndentSTD",
+         "MaximumBlockDepth",
+         "totalFanOut",
+         "Length",
+         "MaintainabilityIndex",
+         "isPublic",
+         "isStatic",
+         "isGetterSetter",
+         "Parameters",
+         "LocalVariables"
+
+
     ]
     indexes = utility.find_indexes(utility.BASE_PATH + "/data/cleaned/")
     process(selected_features, indexes, "train")
