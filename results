@@ -1,0 +1,102 @@
+
+##################################
+logistic
+
+Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.874    0.230    0.874      0.874    0.874      0.643    0.897     0.933     good
+                 0.770    0.126    0.769      0.770    0.769      0.643    0.897     0.832     ugly
+Weighted Avg.    0.837    0.193    0.837      0.837    0.837      0.643    0.897     0.898     
+
+
+For Training
+Accuracy:  0.7603432648934108
+Precision:  0.7727225329154981
+Recall:  0.7376475457503157
+F1-Score:  0.7547777700344697
+Results for  LogisticRegression
+For Testing
+Accuracy:  0.8411363886141334
+Precision:  0.7692776592502286
+Recall:  0.7856809338521401
+F1-Score:  0.7773927773927773
+
+
+
+
+
+#############################
+DecisionTree:
+
+For Testing
+Accuracy:  0.8375096164413672
+Precision:  0.7487091222030982
+Recall:  0.8124513618677043
+F1-Score:  0.7792789430469508
+###########################
+
+NN:
+
+= Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.873    0.216    0.881      0.873    0.877      0.655    0.902     0.934     good
+                 0.784    0.127    0.772      0.784    0.778      0.655    0.902     0.841     ugly
+Weighted Avg.    0.842    0.184    0.842      0.842    0.842      0.655    0.902     0.901     
+
+
+
+Results for  NN
+For Training
+Accuracy:  0.7696819351086849
+Precision:  0.7749380421313506
+Recall:  0.7601232232950705
+F1-Score:  0.7674591440820742
+Results for  NN
+For Testing
+Accuracy:  0.8423453126717222
+Precision:  0.7665667166416792
+Recall:  0.7957976653696498
+F1-Score:  0.7809087437953417
+######################################################
+
+RandomForest:
+
+
+== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.871    0.265    0.858      0.871    0.864      0.610    0.881     0.921     good
+                 0.735    0.129    0.756      0.735    0.745      0.610    0.881     0.802     ugly
+Weighted Avg.    0.823    0.217    0.822      0.823    0.822      0.610    0.881     0.879     
+
+
+
+Results for  RandomForest
+For Training
+Accuracy:  0.8048728735861017
+Precision:  0.8017130532166411
+Recall:  0.8101093397180325
+F1-Score:  0.8058893275482417
+Results for  RandomForest
+For Testing
+Accuracy:  0.8391031981536432
+Precision:  0.7516189379766873
+Recall:  0.8129182879377432
+F1-Score:  0.7810677433826828
+
+##############################################
+
+
+Adaboost
+
+
+Accuracy:  0.8385536872183756
+Precision:  0.7581815489412113
+Recall:  0.796887159533074
+F1-Score:  0.7770526635301259
+
+
+##########################
+
