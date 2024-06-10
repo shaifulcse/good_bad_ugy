@@ -127,7 +127,7 @@ if __name__ == "__main__":
         test_x = scaler.transform(test_x)
 
     cls = train_model(algorithm, train_x, train_y)
-    print (cls.coef_[0])
+    #print (cls.coef_[0])
     pred_y = predict(train_x, cls)
     report_results("Training", algorithm, train_y, pred_y)
 
