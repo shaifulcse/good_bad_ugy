@@ -15,11 +15,12 @@ def split():
 
     f_train = open(DEST_PATH + "train.csv", "w")
     f_test = open(DEST_PATH + "test.csv", "w")
-
+    f_all = open(DEST_PATH + "all.csv", "w")
     fr = open(SRC_PATH + 'checkstyle.csv')
     header = fr.readline()
     f_train.write(header.strip() + "\n")
     f_test.write(header.strip() + "\n")
+    f_all.write(header.strip() + "\n")
     fr.close()
 
     for file in os.listdir(SRC_PATH):
@@ -32,8 +33,10 @@ def split():
         lines = fr.readlines()
         for line in lines:
             fw.write(line.strip() + "\n")
+            f_all.write(line.strip() + "\n")
         fr.close()
     fw.close()
+    f_all.close()
 def select_train_test():
     train = []
     test = []
