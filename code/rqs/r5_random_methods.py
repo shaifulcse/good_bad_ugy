@@ -85,7 +85,7 @@ def select_methods():
         if row['Type'] == 'ugly':
             if row['Project'] not in count_projects:
                 count_projects[row['Project']] = 1
-            elif count_projects[row['Project']] >= 3:
+            elif count_projects[row['Project']] >= 2:
                 continue
             else:
                 count_projects[row['Project']] += 1
@@ -105,7 +105,7 @@ def select_methods():
         if row['Type'] == 'good':
             if row['Project'] not in count_projects:
                 count_projects[row['Project']] = 1
-            elif count_projects[row['Project']] >= 3:
+            elif count_projects[row['Project']] >= 2:
                 continue
             else:
                 count_projects[row['Project']] += 1
