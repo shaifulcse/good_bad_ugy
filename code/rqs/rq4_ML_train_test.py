@@ -9,7 +9,7 @@ Original file is located at
 
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, matthews_corrcoef, roc_curve, auc
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -37,6 +37,7 @@ selected_features = ["SLOCStandard",
                      "Parameters",
                      "LocalVariables"
                      ]
+
 
 
 def load_data(train_file, test_file):
@@ -75,7 +76,20 @@ def report_results(type_data, algorithm, actual_y, pred_y):
     # Calculate F1-score
     f1 = f1_score(actual_y, pred_y, average='binary', pos_label='ugly')
     print("F1-Score: ", f1)
-
+    
+    
+    actual_y = actual_y == 'ugly'
+    pred_y = pred_y == 'ugly' 
+    
+    roc_auc = roc_auc_score(actual_y, pred_y)
+    print ("ROC_AUC-score: ", roc_auc)
+    
+    false_positive_rate, true_positive_rate, thresholds = roc_curve(actual_y, pred_y)
+    ac = auc(false_positive_rate, true_positive_rate)	 
+    print("AUC-score", ac)
+    
+    mcc = matthews_corrcoef(actual_y, pred_y)
+    print("MCC-score: ", mcc)
 
 def train_model(algorithm, train_x, train_y):
     if algorithm == 'LogisticRegression':
@@ -118,11 +132,12 @@ if __name__ == "__main__":
 
     test_x, test_y = clean_data(test_data)
 
-    algorithm = algorithms[4]
+    algorithm = algorithms[2]
+    
     if algorithm == "NN":
         print ("scaling")
         scaler = StandardScaler()
-        # Don't cheat - fit only on training data
+
         scaler.fit(train_x)
         train_x = scaler.transform(train_x)
         # apply same transformation to test data
